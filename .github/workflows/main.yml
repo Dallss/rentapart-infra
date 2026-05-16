@@ -13,7 +13,16 @@ jobs:
       - name: Checkout infra repo
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
+      - name: Copy docker-compose to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "~/docker-compose.yml"
+
+      - name: Deploy on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VM_IP }}
@@ -22,30 +31,12 @@ jobs:
           script: |
             echo "Deploying RentApart..."
 
-            # write compose file on VM
-            cat > docker-compose.yml << 'EOF'
-            version: "3.9"
-
-            services:
-              backend:
-                image: ghcr.io/YOUR_USERNAME/rentapart:latest
-                container_name: rentapart-backend
-                ports:
-                  - "8000:8000"
-                restart: unless-stopped
-
-              frontend:
-                image: ghcr.io/YOUR_USERNAME/rent-apart:latest
-                container_name: rentapart-frontend
-                ports:
-                  - "3000:3000"
-                restart: unless-stopped
-            EOF
+            cd ~
 
             echo "Pulling latest images..."
             docker compose pull
 
-            echo "Starting containers..."
+            echo "Starting services..."
             docker compose up -d
 
-            echo "Deployment complete."
+            echo "Deployment complete"
