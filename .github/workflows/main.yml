@@ -1,42 +1,33 @@
-name: Deploy RentApart to VM
+name: SSH Smoke Test
 
 on:
-  workflow_dispatch: {}
-  repository_dispatch:
-    types: [deploy]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  ssh-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout infra repo
-        uses: actions/checkout@v4
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
 
-      - name: Copy docker-compose to VM
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VM_IP }}
-          username: ubuntu
-          key: ${{ secrets.VM_SSH_KEY }}
-          source: "docker-compose.yml"
-          target: "~/docker-compose.yml"
+      - name: Add VM to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy on VM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VM_IP }}
-          username: ubuntu
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
-            echo "Deploying RentApart..."
+      - name: Run remote test command
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+          echo "SSH SUCCESS"
+          echo "Hostname: $(hostname)"
+          echo "Date: $(date)"
 
-            cd ~
+          # create a file to prove write access
+          echo "github-actions-ssh-ok" > /tmp/ssh_test.txt
 
-            echo "Pulling latest images..."
-            docker compose pull
-
-            echo "Starting services..."
-            docker compose up -d
-
-            echo "Deployment complete"
+          echo "File created:"
+          cat /tmp/ssh_test.txt
+          EOF
