@@ -1,0 +1,51 @@
+name: Deploy RentApart to VM
+
+on:
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: [deploy]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout infra repo
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            echo "Deploying RentApart..."
+
+            # write compose file on VM
+            cat > docker-compose.yml << 'EOF'
+            version: "3.9"
+
+            services:
+              backend:
+                image: ghcr.io/YOUR_USERNAME/rentapart:latest
+                container_name: rentapart-backend
+                ports:
+                  - "8000:8000"
+                restart: unless-stopped
+
+              frontend:
+                image: ghcr.io/YOUR_USERNAME/rent-apart:latest
+                container_name: rentapart-frontend
+                ports:
+                  - "3000:3000"
+                restart: unless-stopped
+            EOF
+
+            echo "Pulling latest images..."
+            docker compose pull
+
+            echo "Starting containers..."
+            docker compose up -d
+
+            echo "Deployment complete."
