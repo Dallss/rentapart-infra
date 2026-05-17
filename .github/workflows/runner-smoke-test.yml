@@ -1,0 +1,15 @@
+name: Smoketest
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoketest:
+    runs-on: [self-hosted, deploy]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run smoketest
+        run: |
+          echo "Running smoketest..."
+          # add your smoketest command here
