@@ -12,11 +12,7 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Pull latest images
+      - name: Deploy
         run: |
-          docker pull ghcr.io/Dallss/rentapart:latest
-          docker pull ghcr.io/Dallss/rentapart-frontend:latest
-
-      - name: Run docker compose
-        run: |
-          docker compose up -d
+          docker compose pull
+          docker compose up -d --remove-orphans
