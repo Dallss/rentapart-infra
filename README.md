@@ -1,6 +1,6 @@
 # RentApart Infra
 
-Infrastructure repository for deploying the RentApart platform using Docker Compose and a self-hosted GitHub Actions runner.
+This repository manages the platform’s containerized deployment environment, CI/CD integration, and self-hosted deployment runner using Docker Compose and GitHub Actions.
 
 ## Purpose
 
