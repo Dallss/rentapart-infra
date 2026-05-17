@@ -1,15 +1,12 @@
-version: "3.9"
-
 services:
   backend:
-    image: ghcr.io/Dallss/rentapart:latest
+    image: ghcr.io/dallss/rentapart:latest
     container_name: rentapart-backend
     ports:
       - "8000:8000"
     restart: unless-stopped
-
   frontend:
-    image: ghcr.io/Dallss/rent-apart:latest
+    image: ghcr.io/dallss/rent-apart:latest
     container_name: rentapart-frontend
     ports:
       - "3000:3000"
