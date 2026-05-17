@@ -1,12 +1,12 @@
 services:
   backend:
-    image: ghcr.io/dallss/rentapart:latest
+    image: ghcr.io/dallss/rent-apart-backend:latest
     container_name: rentapart-backend
     ports:
       - "8000:8000"
     restart: unless-stopped
   frontend:
-    image: ghcr.io/dallss/rent-apart:latest
+    image: ghcr.io/dallss/rent-apart-frontend:latest
     container_name: rentapart-frontend
     ports:
       - "3000:3000"
