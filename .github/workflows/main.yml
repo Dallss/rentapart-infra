@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   ssh-test:
-    runs-on: self-hosted  # your runner label
+    runs-on: front-end  # your runner label
     steps:
       - name: Run test command
         run: |
