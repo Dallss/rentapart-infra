@@ -2,12 +2,21 @@ name: deploy
 on:
   workflow_dispatch:
 jobs:
-  ssh-test:
-    runs-on: front-end  # your runner label
+  deploy:
+    runs-on: deploy
     steps:
-      - name: Run test command
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
         run: |
-          echo "SUCCESS - running on $(hostname)"
-          echo "Date: $(date)"
-          echo "github-actions-ok" > /tmp/ssh_test.txt
-          cat /tmp/ssh_test.txt
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull latest images
+        run: |
+          docker pull ghcr.io/Dallss/rentapart:latest
+          docker pull ghcr.io/Dallss/rentapart-frontend:latest
+
+      - name: Run docker compose
+        run: |
+          docker compose up -d
