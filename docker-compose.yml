@@ -5,9 +5,14 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    env_file:
+      - /opt/rent-apart/.env
+
   frontend:
     image: ghcr.io/dallss/rent-apart-frontend:latest
     container_name: rentapart-frontend
     ports:
       - "3000:3000"
     restart: unless-stopped
+    env_file:
+      - /opt/rent-apart/.env
